@@ -1,5 +1,5 @@
 [build]
-builder = "DOCKERFILE"
+builder = "NIXPACKS"
 
 [deploy]
 startCommand = "npx prisma migrate deploy && node src/index.js"

@@ -47,40 +47,53 @@ Each project card shows your role within that project:
 ## Local Development
 
 ### Prerequisites
+
 - Node.js 20+
-- Docker Desktop (for PostgreSQL)
+- PostgreSQL installed locally — download from [postgresql.org](https://www.postgresql.org/download/)
 
 ### 1. Clone & install
 
 ```bash
 git clone https://github.com/your-username/teamflow.git
 cd teamflow
+```
 
+```bash
 # Backend
 cd backend
 npm install
+```
 
+```bash
 # Frontend
 cd ../frontend
 npm install
 ```
 
-### 2. Configure environment
+### 2. Create the database
+
+Open **pgAdmin** or **psql** and run:
+
+```sql
+CREATE DATABASE taskmanager;
+CREATE USER taskuser WITH PASSWORD 'taskpass';
+GRANT ALL PRIVILEGES ON DATABASE taskmanager TO taskuser;
+```
+
+### 3. Configure environment
 
 ```bash
 cp backend/.env.example backend/.env
-# Edit DATABASE_URL and JWT_SECRET in backend/.env
 ```
 
-### 3. Start the database
+Edit `backend/.env`:
 
-```bash
-docker run -d --name teamflow-db \
-  -e POSTGRES_USER=taskuser \
-  -e POSTGRES_PASSWORD=taskpass \
-  -e POSTGRES_DB=taskmanager \
-  -p 5432:5432 \
-  postgres:16-alpine
+```env
+DATABASE_URL="postgresql://taskuser:taskpass@localhost:5432/taskmanager"
+JWT_SECRET="any-long-random-string-here"
+PORT=5000
+FRONTEND_URL="http://localhost:5173"
+NODE_ENV="development"
 ```
 
 ### 4. Run migrations and seed
@@ -97,7 +110,9 @@ node prisma/seed.js
 # Terminal 1 — backend (port 5000)
 cd backend
 npm run dev
+```
 
+```bash
 # Terminal 2 — frontend (port 5173)
 cd frontend
 npm run dev
@@ -109,12 +124,9 @@ Open [http://localhost:5173](http://localhost:5173)
 
 ## Returning to the project
 
-If you've already set up the project and just want to run it again:
+If the project is already set up, just start both servers:
 
 ```bash
-# Start the database container
-docker start teamflow-db
-
 # Terminal 1
 cd backend && npm run dev
 
@@ -122,41 +134,61 @@ cd backend && npm run dev
 cd frontend && npm run dev
 ```
 
----
-
-## Docker (full stack)
-
-```bash
-docker-compose up --build
-```
-
-Open [http://localhost](http://localhost)
+Make sure PostgreSQL is running on your machine before starting.
 
 ---
 
 ## Deployment on Railway
 
-### Backend
+### Step 1 — Push to GitHub
 
-1. Create a new Railway project
-2. Add a **PostgreSQL** plugin — Railway auto-sets `DATABASE_URL`
-3. Add a new service from GitHub (point to `/backend`)
-4. Set environment variables:
-   ```
-   JWT_SECRET=<random-secret>
-   FRONTEND_URL=https://your-frontend.railway.app
-   NODE_ENV=production
-   ```
-5. Railway uses `railway.toml` — migrations run automatically on deploy
+Make sure your project is pushed to a GitHub repository.
 
-### Frontend
+### Step 2 — Create Railway project
 
-1. Add another service from GitHub (point to `/frontend`)
-2. Set build command: `npm run build`
-3. Set environment variable:
-   ```
-   VITE_API_URL=https://your-backend.railway.app/api
-   ```
+1. Go to [railway.app](https://railway.app) and log in
+2. Click **New Project** → **GitHub Repository**
+3. Select your `teamflow` repo
+
+### Step 3 — Add PostgreSQL
+
+1. In the Railway project dashboard, click **New** → **Database** → **PostgreSQL**
+2. Railway automatically sets `DATABASE_URL` for your backend service
+
+### Step 4 — Configure backend service
+
+1. Click on the backend service → **Settings**
+2. Set **Root Directory** to `backend`
+3. Go to **Variables** tab and add:
+
+   | Variable | Value |
+   |----------|-------|
+   | `JWT_SECRET` | any long random string |
+   | `NODE_ENV` | `production` |
+   | `FRONTEND_URL` | add after frontend is deployed |
+
+4. Railway uses `railway.toml` — migrations run automatically on every deploy
+
+### Step 5 — Add frontend service
+
+1. Click **New** → **GitHub Repository** → select `teamflow` again
+2. Click on the service → **Settings**
+3. Set **Root Directory** to `frontend`
+4. Go to **Variables** tab and add:
+
+   | Variable | Value |
+   |----------|-------|
+   | `VITE_API_URL` | `https://your-backend.up.railway.app/api` |
+
+### Step 6 — Generate public URLs
+
+1. Backend service → **Settings** → **Networking** → **Generate Domain**
+2. Frontend service → **Settings** → **Networking** → **Generate Domain**
+3. Copy the frontend URL and update `FRONTEND_URL` in the backend variables
+
+### Step 7 — Verify
+
+Visit your frontend Railway URL — the app should be fully live.
 
 ---
 
