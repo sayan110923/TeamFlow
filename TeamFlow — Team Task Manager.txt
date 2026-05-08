@@ -1,0 +1,146 @@
+TeamFlow — Team Task Manager
+A full-stack web app for managing projects, assigning tasks, and tracking progress with role-based access control.
+
+Live Demo
+https://your-app.railway.app
+
+Features
+Authentication — JWT-based signup/login
+Projects — Create, update, delete projects; invite team members by email
+Role-based access — Project owners/admins manage everything; Members can only update task status
+Tasks — Create tasks with title, description, priority, due date, and assignee
+Kanban board — Column view (To Do / In Progress / Done) with inline status updates
+Dashboard — Summary stats, my open tasks, per-project progress bars, overdue indicators
+Filters — Filter tasks by status and priority
+Tech Stack
+Layer	Technology
+Frontend	React 18, Vite, TailwindCSS, React Query, React Router
+Backend	Node.js, Express, Prisma ORM
+Database	PostgreSQL
+Auth	JWT (7-day tokens)
+Deployment	Railway (backend + DB + frontend)
+Local Development
+Prerequisites
+Node.js 20+
+PostgreSQL installed locally — download from postgresql.org
+1. Clone & install
+git clone https://github.com/your-username/teamflow.git
+cd teamflow
+# Backend
+cd backend
+npm install
+# Frontend
+cd ../frontend
+npm install
+2. Create the database
+Open pgAdmin or psql and run:
+
+CREATE DATABASE taskmanager;
+CREATE USER taskuser WITH PASSWORD 'taskpass';
+GRANT ALL PRIVILEGES ON DATABASE taskmanager TO taskuser;
+3. Configure environment
+cp backend/.env.example backend/.env
+Edit backend/.env:
+
+DATABASE_URL="postgresql://taskuser:taskpass@localhost:5432/taskmanager"
+JWT_SECRET="any-long-random-string-here"
+PORT=5000
+FRONTEND_URL="http://localhost:5173"
+NODE_ENV="development"
+4. Run migrations and seed
+cd backend
+npx prisma migrate dev --name init
+node prisma/seed.js
+5. Start both servers
+# Terminal 1 — backend (port 5000)
+cd backend
+npm run dev
+# Terminal 2 — frontend (port 5173)
+cd frontend
+npm run dev
+Open http://localhost:5173
+
+Returning to the project
+If the project is already set up, just start both servers:
+
+# Terminal 1
+cd backend && npm run dev
+
+# Terminal 2
+cd frontend && npm run dev
+Make sure PostgreSQL is running on your machine before starting.
+
+Deployment on Railway
+Step 1 — Push to GitHub
+Make sure your project is pushed to a GitHub repository.
+
+Step 2 — Create Railway project
+Go to railway.app and log in
+Click New Project → GitHub Repository
+Select your teamflow repo
+Step 3 — Add PostgreSQL
+In the Railway project dashboard, click New → Database → PostgreSQL
+Railway automatically sets DATABASE_URL for your backend service
+Step 4 — Configure backend service
+Click on the backend service → Settings
+
+Set Root Directory to backend
+
+Go to Variables tab and add:
+
+Variable	Value
+JWT_SECRET	any long random string
+NODE_ENV	production
+FRONTEND_URL	add after frontend is deployed
+Railway uses railway.toml — migrations run automatically on every deploy
+
+Step 5 — Add frontend service
+Click New → GitHub Repository → select teamflow again
+
+Click on the service → Settings
+
+Set Root Directory to frontend
+
+Go to Variables tab and add:
+
+Variable	Value
+VITE_API_URL	https://your-backend.up.railway.app/api
+Step 6 — Generate public URLs
+Backend service → Settings → Networking → Generate Domain
+Frontend service → Settings → Networking → Generate Domain
+Copy the frontend URL and update FRONTEND_URL in the backend variables
+Step 7 — Verify
+Visit your frontend Railway URL — the app should be fully live.
+
+API Reference
+Method	Endpoint	Auth	Description
+POST	/api/auth/signup	—	Register
+POST	/api/auth/login	—	Login
+GET	/api/users/me	✓	Get current user
+PUT	/api/users/me	✓	Update current user
+GET	/api/projects	✓	List my projects
+POST	/api/projects	✓	Create project
+GET	/api/projects/:id	✓ Member	Get project
+PUT	/api/projects/:id	✓ Admin	Update project
+DELETE	/api/projects/:id	✓ Admin	Delete project
+GET	/api/projects/:id/members	✓ Member	List members
+POST	/api/projects/:id/members	✓ Admin	Add member
+PUT	/api/projects/:id/members/:uid	✓ Admin	Change role
+DELETE	/api/projects/:id/members/:uid	✓ Admin	Remove member
+GET	/api/tasks/project/:id	✓ Member	List tasks (filterable)
+POST	/api/tasks/project/:id	✓ Admin	Create task
+GET	/api/tasks/:id	✓ Member	Get task
+PUT	/api/tasks/:id	✓ Member*	Update task
+DELETE	/api/tasks/:id	✓ Admin	Delete task
+GET	/api/dashboard	✓	Dashboard stats & tasks
+GET	/health	—	Health check
+*Members can only update status. Admins can update all fields.
+
+Role Permissions
+Action	Admin	Member
+Create/edit/delete project	✅	❌
+Add/remove members	✅	❌
+Create/delete tasks	✅	❌
+Edit task details	✅	❌
+Update task status	✅	✅
+View project & tasks	✅	✅
