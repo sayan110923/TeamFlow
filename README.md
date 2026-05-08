@@ -2,10 +2,6 @@
 
 A full-stack web app for managing projects, assigning tasks, and tracking progress with role-based access control.
 
-## Live Demo
-
-> **[https://your-app.railway.app](https://your-app.railway.app)**
-
 ---
 
 ## Features
@@ -177,35 +173,6 @@ Make sure your project is pushed to a GitHub repository.
 ### Step 7 — Verify
 
 Visit your frontend Railway URL — the app should be fully live.
-
----
-
-## API Reference
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/api/auth/signup` | — | Register |
-| POST | `/api/auth/login` | — | Login |
-| GET | `/api/users/me` | ✓ | Get current user |
-| PUT | `/api/users/me` | ✓ | Update current user |
-| GET | `/api/projects` | ✓ | List my projects |
-| POST | `/api/projects` | ✓ | Create project |
-| GET | `/api/projects/:id` | ✓ Member | Get project |
-| PUT | `/api/projects/:id` | ✓ Admin | Update project |
-| DELETE | `/api/projects/:id` | ✓ Admin | Delete project |
-| GET | `/api/projects/:id/members` | ✓ Member | List members |
-| POST | `/api/projects/:id/members` | ✓ Admin | Add member |
-| PUT | `/api/projects/:id/members/:uid` | ✓ Admin | Change role |
-| DELETE | `/api/projects/:id/members/:uid` | ✓ Admin | Remove member |
-| GET | `/api/tasks/project/:id` | ✓ Member | List tasks (filterable) |
-| POST | `/api/tasks/project/:id` | ✓ Admin | Create task |
-| GET | `/api/tasks/:id` | ✓ Member | Get task |
-| PUT | `/api/tasks/:id` | ✓ Member* | Update task |
-| DELETE | `/api/tasks/:id` | ✓ Admin | Delete task |
-| GET | `/api/dashboard` | ✓ | Dashboard stats & tasks |
-| GET | `/health` | — | Health check |
-
-*Members can only update `status`. Admins can update all fields.
 
 ---
 
