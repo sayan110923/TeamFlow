@@ -48,7 +48,7 @@ const getDashboard = async (req, res, next) => {
       memberships.map(async (m) => {
         const project = await prisma.project.findUnique({
           where: { id: m.projectId },
-          select: { id: true, name: true, ownerId: true },
+          select: { id: true, name: true },
         });
         const [total, done, overdue] = await Promise.all([
           prisma.task.count({ where: { projectId: m.projectId } }),
@@ -64,7 +64,6 @@ const getDashboard = async (req, res, next) => {
         return {
           project,
           role: m.role,
-          isOwner: project.ownerId === userId,
           total,
           done,
           overdue,

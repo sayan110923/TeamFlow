@@ -9,7 +9,6 @@ const listProjects = async (req, res, next) => {
         project: {
           include: {
             _count: { select: { tasks: true, members: true } },
-            owner: { select: { id: true, name: true, email: true } },
           },
         },
       },
@@ -44,7 +43,6 @@ const createProject = async (req, res, next) => {
       },
       include: {
         _count: { select: { tasks: true, members: true } },
-        owner: { select: { id: true, name: true, email: true } },
       },
     });
 
@@ -59,7 +57,6 @@ const getProject = async (req, res, next) => {
     const project = await prisma.project.findUnique({
       where: { id: req.params.projectId },
       include: {
-        owner: { select: { id: true, name: true, email: true } },
         members: {
           include: { user: { select: { id: true, name: true, email: true } } },
         },
@@ -168,10 +165,6 @@ const updateMemberRole = async (req, res, next) => {
 
 const removeMember = async (req, res, next) => {
   const { projectId, userId } = req.params;
-
-  if (req.project.ownerId === userId) {
-    return res.status(400).json({ error: 'Cannot remove the project owner' });
-  }
 
   try {
     await prisma.projectMember.delete({

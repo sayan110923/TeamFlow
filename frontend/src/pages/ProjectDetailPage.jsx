@@ -7,7 +7,6 @@ import {
   ArrowLeft,
   UserPlus,
   Trash2,
-  Crown,
   Filter,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -344,11 +343,10 @@ export default function ProjectDetailPage() {
                 <p className="text-xs text-gray-500">{m.user.email}</p>
               </div>
               <div className="flex items-center gap-2">
-                {m.role === 'ADMIN' && <Crown className="w-4 h-4 text-yellow-500" />}
                 <span className={`badge ${m.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>
-                  {m.role}
+                  {m.role === 'ADMIN' ? 'Admin' : 'Member'}
                 </span>
-                {isAdmin && m.user.id !== user.id && m.user.id !== project.ownerId && (
+                {isAdmin && m.user.id !== user.id && (
                   <button
                     onClick={() => removeMemberMutation.mutate(m.user.id)}
                     className="p-1 text-gray-400 hover:text-red-500 rounded"

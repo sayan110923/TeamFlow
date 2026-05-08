@@ -1,21 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, FolderKanban, Users, CheckSquare, Trash2, Crown } from 'lucide-react';
+import { Plus, FolderKanban, Users, CheckSquare, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../lib/api';
 import Modal from '../components/Modal';
 import { useAuth } from '../context/AuthContext';
-
-function getRoleBadge(project, userId) {
-  if (project.owner?.id === userId) {
-    return { label: 'Owner', className: 'bg-purple-100 text-purple-700' };
-  }
-  if (project.myRole === 'ADMIN') {
-    return { label: 'Admin', className: 'bg-blue-100 text-blue-700' };
-  }
-  return { label: 'Member', className: 'bg-gray-100 text-gray-600' };
-}
 
 export default function ProjectsPage() {
   const qc = useQueryClient();
@@ -88,54 +78,53 @@ export default function ProjectsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {projects.map((project) => {
-            const badge = getRoleBadge(project, user?.id);
-            const isOwner = project.owner?.id === user?.id;
-            return (
-              <div key={project.id} className="card p-5 hover:shadow-md transition-shadow group">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1 min-w-0">
-                    <Link
-                      to={`/projects/${project.id}`}
-                      className="text-base font-semibold text-gray-900 hover:text-blue-600 block truncate"
-                    >
-                      {project.name}
-                    </Link>
-                    {project.description && (
-                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">{project.description}</p>
-                    )}
-                  </div>
-                  {isOwner && (
-                    <button
-                      onClick={() => {
-                        if (confirm('Delete this project and all its tasks?')) {
-                          deleteMutation.mutate(project.id);
-                        }
-                      }}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all ml-2"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+          {projects.map((project) => (
+            <div key={project.id} className="card p-5 hover:shadow-md transition-shadow group">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1 min-w-0">
+                  <Link
+                    to={`/projects/${project.id}`}
+                    className="text-base font-semibold text-gray-900 hover:text-blue-600 block truncate"
+                  >
+                    {project.name}
+                  </Link>
+                  {project.description && (
+                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">{project.description}</p>
                   )}
                 </div>
-
-                <div className="flex items-center gap-4 text-sm text-gray-500 mt-4">
-                  <span className="flex items-center gap-1.5">
-                    <CheckSquare className="w-4 h-4" />
-                    {project._count?.tasks ?? 0} tasks
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Users className="w-4 h-4" />
-                    {project._count?.members ?? 0} members
-                  </span>
-                  <span className={`ml-auto badge flex items-center gap-1 ${badge.className}`}>
-                    {isOwner && <Crown className="w-3 h-3" />}
-                    {badge.label}
-                  </span>
-                </div>
+                {project.myRole === 'ADMIN' && (
+                  <button
+                    onClick={() => {
+                      if (confirm('Delete this project and all its tasks?')) {
+                        deleteMutation.mutate(project.id);
+                      }
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all ml-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
               </div>
-            );
-          })}
+
+              <div className="flex items-center gap-4 text-sm text-gray-500 mt-4">
+                <span className="flex items-center gap-1.5">
+                  <CheckSquare className="w-4 h-4" />
+                  {project._count?.tasks ?? 0} tasks
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Users className="w-4 h-4" />
+                  {project._count?.members ?? 0} members
+                </span>
+                <span className={`ml-auto badge ${
+                  project.myRole === 'ADMIN'
+                    ? 'bg-purple-100 text-purple-700'
+                    : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {project.myRole === 'ADMIN' ? 'Admin' : 'Member'}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

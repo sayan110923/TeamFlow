@@ -108,14 +108,7 @@ export default function DashboardPage() {
               {projectStats?.length === 0 && (
                 <p className="text-sm text-gray-500">No projects yet.</p>
               )}
-              {projectStats?.map(({ project, progress, total, done, overdue, role, isOwner }) => {
-                const badgeLabel = isOwner ? 'Owner' : role === 'ADMIN' ? 'Admin' : 'Member';
-                const badgeClass = isOwner
-                  ? 'bg-purple-100 text-purple-700'
-                  : role === 'ADMIN'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-600';
-                return (
+              {projectStats?.map(({ project, progress, total, done, overdue, role }) => (
                   <div key={project.id}>
                     <div className="flex items-center justify-between mb-1">
                       <Link
@@ -135,11 +128,14 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
                       <span>{done}/{total} done</span>
                       {overdue > 0 && <span className="text-red-500">{overdue} overdue</span>}
-                      <span className={`ml-auto badge ${badgeClass}`}>{badgeLabel}</span>
+                      <span className={`ml-auto badge ${
+                        role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {role === 'ADMIN' ? 'Admin' : 'Member'}
+                      </span>
                     </div>
                   </div>
-                );
-              })}
+                ))}
             </div>
           </div>
         </div>

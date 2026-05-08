@@ -32,18 +32,6 @@ A full-stack web app for managing projects, assigning tasks, and tracking progre
 
 ---
 
-## Role Badges
-
-Each project card shows your role within that project:
-
-| Badge | Meaning |
-|-------|---------|
-| 👑 Owner | You created this project |
-| Admin | You were promoted to admin by the owner |
-| Member | You were added as a regular member |
-
----
-
 ## Local Development
 
 ### Prerequisites
@@ -223,8 +211,8 @@ Visit your frontend Railway URL — the app should be fully live.
 
 ## Role Permissions
 
-| Action | Owner/Admin | Member |
-|--------|-------------|--------|
+| Action | Admin | Member |
+|--------|-------|--------|
 | Create/edit/delete project | ✅ | ❌ |
 | Add/remove members | ✅ | ❌ |
 | Create/delete tasks | ✅ | ❌ |
